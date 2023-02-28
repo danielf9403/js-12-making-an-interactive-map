@@ -1,5 +1,46 @@
 // map object
+const myMap = {
+    coorinate: [],
+    business: [],
+    map: {},
+    markers: {},
 
+    // build leaf map
+    buildMap() {
+        this.map = L.map('map', {
+        center: this.coorinate,
+        zoom: 11,    
+        });
+
+        // add openstreetmap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		attribution:
+			'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+		minZoom: '15',
+		}).addTo(this.map)
+        const marker = L.marker(this.coordinates)
+		marker
+		.addTo(this.map)
+		.bindPopup('<p1><b>You are here</b><br></p1>')
+		.openPopup()
+    },
+
+   // re-watch jQuarry aplication
+
+    // add business markers
+
+    addMarkers() {
+        for (var i = 0; i < this.businesses.length; i++) {
+            this,this.markers = L.marker([
+                this.businesses[i].lat,
+                this.businesses[i].long,
+
+            ])
+                .bindPrpup(`<p1>${this.businesses[i].name}</p1>`)
+                .addTo(this.map)
+        }
+    },
+}
 // get coordinates via geolocation api
 
 // get foursquare businesses
@@ -40,6 +81,7 @@ function processBusiness(data){
 }
 
 // event handlers
+
 // window load
 
 // business submit button
