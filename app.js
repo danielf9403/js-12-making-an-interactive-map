@@ -1,14 +1,14 @@
 // map object
 const myMap = {
-    coorinate: [],
-    business: [],
+    coordinates: [],
+    businesses: [],
     map: {},
     markers: {},
 
     // build leaf map
     buildMap() {
         this.map = L.map('map', {
-        center: this.coorinate,
+        center: this.coordinates,
         zoom: 11,    
         });
 
@@ -25,13 +25,13 @@ const myMap = {
 		.openPopup()
     },
 
-   // re-watch jQuarry aplication
+   
 
     // add business markers
 
     addMarkers() {
         for (var i = 0; i < this.businesses.length; i++) {
-            this,this.markers = L.marker([
+        this,this.markers = L.marker([
                 this.businesses[i].lat,
                 this.businesses[i].long,
 
@@ -41,8 +41,14 @@ const myMap = {
         }
     },
 }
-// get coordinates via geolocation api
 
+// get coordinates via geolocation api
+async function getCoords(){
+    const pos = await new Promise((resolve, reject) =>{
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+    });
+    return [ pos.coords.latitude, pos.coords.longitude]
+}
 // get foursquare businesses
 async function getFoursquare(business) {
     const options ={
@@ -50,14 +56,12 @@ async function getFoursquare(business) {
         headerrs: {
         Accept: 'application/json',
         Authorization: 'fsq3ATzZbmcGhdeFafr73wZcnJ+LlN6bK+4dh19a7ClS4u8='
-        },
-    };
+        }
+    }
     let limit = 5
-    let lat = 39.9472156;
-    // myMap.coordinate[0]
-    let lon = -75.1651748;
-    // myMap.coordinate[1]
-    let response = await fetch(`https://api.foursquare.com/v3/places/search?&query=${business}&limit=${limit}&ll=${lat}%2C${lon}`, options)
+    let lat = myMap.coordinates[0]
+    let lon = myMap.coordinates[1]
+    let response = await fetch(`https://cors-anywhere.herokuapp.com/https://api.foursquare.com/v3/places/search?&query=coffee&limit=5&ll=41.8781%2C-87.6298`, options)
     let data = await response.text()
     let parsedData = JSON.parse(data)
     let businesses = parsedData.results
@@ -68,12 +72,12 @@ console.log(getFoursquare("coffee shops"))
 
 // process foursquare array
 
-function processBusiness(data){
+function processBusinesses(data){
     let businesses = data.map((element) => {
         let location = {
             name: element.name,
             lat : element.geocodes.main.latitude,
-            long: element.geocodes.main.longitude
+            long: element.geocodes.main.longitude,
         };
         return location
     });
@@ -82,8 +86,14 @@ function processBusiness(data){
 
 // event handlers
 
-// window load
+// window load 
 
+// re-watch jQuarry exercise
+window.onload = async () => {
+    const coords = await getCoords()
+    myMap.coordinates = coords
+    myMap.buildMap()
+}
 // business submit button
 
 document.getElementById("submit").addEventListener('click', async (event) =>{
